@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Check planetCoins balance</title>
+  <title>Check Balance</title>
   <style>
     body {
       margin: 0;
@@ -79,9 +79,9 @@
 </head>
 <body>
   <div class="login-container">
-    <h2>Check planetCoins balance</h2>
+    <h2>Login</h2>
     <form onsubmit="return validateForm(event)">
-      <input type="text" id="username" placeholder="Username or Email" required>
+      <input type="text" id="usernameOrEmail" placeholder="Username or Email" required>
       <input type="password" id="password" placeholder="Password" required>
       <button type="submit">Check Balance</button>
       <span class="error-message" id="login-error"></span>
@@ -101,7 +101,7 @@
         // Hardcoded credentials for learning purposes (not secure for real-world use)
         var validCredentials = {
           'Jayden': 'firstcustomer24917',
-          'Illia': 'somewhere285013',
+          'Illia': 'niceperson149273',
           'Wasim': 'goatedgamers437592'
         };
 
@@ -109,7 +109,7 @@
         var enteredPassword = passwordInput.value.trim();
 
         if (enteredUsername === "" || enteredPassword === "") {
-          loginErrorMessage.textContent = 'Please enter both username and password';
+          loginErrorMessage.textContent = 'Please enter both username or email and password';
           loginSuccessMessage.textContent = ''; // Clear success message if any
           isValid = false;
         } else if (validCredentials[enteredUsername] === enteredPassword) {
@@ -117,7 +117,7 @@
           if (enteredUsername === 'Jayden') {
             loginSuccessMessage.textContent = 'You have 10 planetCoins';
           } else {
-            loginSuccessMessage.textContent = 'You have 0 planetCoins';
+            loginSuccessMessage.textContent = 'You can have 0 planetCoins';
           }
         } else {
           loginErrorMessage.textContent = 'Invalid username or password';
