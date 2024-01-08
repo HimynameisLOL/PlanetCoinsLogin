@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Login Page</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to right, #2196F3, #0D47A1);
+    }
+
+    .login-container {
+      font-family: 'Lexend Bold', sans-serif;
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(0, 0, 0, 0.3);
+      animation: glowAnimation 2s infinite alternate;
+      overflow: hidden;
+      width: 300px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    @keyframes glowAnimation {
+      0% {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(0, 0, 0, 0.3);
+      }
+      100% {
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), 0 0 50px rgba(0, 0, 0, 0.6), 0 0 80px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    .login-container input {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-container button {
+      font-family: 'Lexend Bold', sans-serif;
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 12px 15px; /* Increase the padding for a larger button */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      margin-top: 10px; /* Adjust the margin-top to move the button lower down */
+    }
+
+    /* Success message style */
+    .success-message {
+      color: #00C851;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+
+    /* Error message style */
+    .error-message {
+      display: block; /* Make it a block-level element */
+      color: #ff0000;
+      font-size: 12px; /* Adjust the font size for a smaller error message */
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form onsubmit="return validateForm()">
+      <input type="text" id="usernameOrEmail" placeholder="Username or Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <span class="error-message" id="login-error"></span>
+      <span class="success-message" id="login-success"></span>
+    </form>
+
+    <script>
+      function validateForm() {
+        var usernameOrEmailInput = document.getElementById('usernameOrEmail');
+        var passwordInput = document.getElementById('password');
+        var loginErrorMessage = document.getElementById('login-error');
+        var loginSuccessMessage = document.getElementById('login-success');
+        var isValid = true;
+
+        // Hardcoded credentials for learning purposes (not secure for real-world use)
+        var validCredentials = {
+          'Jayden': 'firstcustomer24917',
+          'Illia': 'niceperson149273',
+          'Wasim': 'goatedgamers437592'
+        };
+
+        var enteredUsername = usernameOrEmailInput.value.trim();
+        var enteredPassword = passwordInput.value.trim();
+
+        if (enteredUsername === "" || enteredPassword === "") {
+          loginErrorMessage.textContent = 'Please enter both username or email and password';
+          loginSuccessMessage.textContent = ''; // Clear success message if any
+          isValid = false;
+        } else if (validCredentials[enteredUsername] === enteredPassword) {
+          loginErrorMessage.textContent = ''; // Clear previous error messages
+          loginSuccessMessage.textContent = 'Correct! Logging in...';
+
+          // Redirect based on username
+          switch (enteredUsername) {
+            case 'Jayden':
+              window.location.href = 'https://jayden.com';
+              break;
+            case 'Illia':
+              window.location.href = 'https://illia.com';
+              break;
+            case 'Wasim':
+              window.location.href = 'https://wasim.com';
+              break;
+            // Add more cases as needed
+            default:
+              break;
+          }
+        } else {
+          loginErrorMessage.textContent = 'Invalid username or password';
+          loginSuccessMessage.textContent = ''; // Clear success message if any
+          isValid = false;
+        }
+
+        return isValid;
+      }
+    </script>
+  </div>
+</body>
+</html>
