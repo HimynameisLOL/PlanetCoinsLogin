@@ -112,22 +112,10 @@
           isValid = false;
         } else if (validCredentials[enteredUsername] === enteredPassword) {
           loginErrorMessage.textContent = ''; // Clear previous error messages
-          loginSuccessMessage.textContent = 'Correct! Logging in...';
-
-          // Redirect based on username
-          switch (enteredUsername) {
-            case 'Jayden':
-              window.location.href = 'https://jayden.com';
-              break;
-            case 'Illia':
-              window.location.href = 'https://illia.com';
-              break;
-            case 'Wasim':
-              window.location.href = 'https://wasim.com';
-              break;
-            // Add more cases as needed
-            default:
-              break;
+          if (enteredUsername === 'Jayden') {
+            loginSuccessMessage.textContent = 'You have 10 planetCoins';
+          } else {
+            loginSuccessMessage.textContent = 'You can have 0 planetCoins';
           }
         } else {
           loginErrorMessage.textContent = 'Invalid username or password';
