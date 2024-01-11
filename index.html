@@ -234,45 +234,87 @@ function validateForm(event) {
 
 
 
-      // Admin panel functionality
-      function addUser() {
-        var newUsernameInput = document.getElementById('newUsername');
-        var newPasswordInput = document.getElementById('newPassword');
-        var newBalanceInput = document.getElementById('newBalance');
-        var adminPanel = document.getElementById('adminPanel');
-        var successMessage = document.getElementById('login-success');
+// Admin panel functionality
+function addUser() {
+  var newUsernameInput = document.getElementById('newUsername');
+  var newPasswordInput = document.getElementById('newPassword');
+  var newBalanceInput = document.getElementById('newBalance');
+  var adminPanel = document.getElementById('adminPanel');
+  var successMessage = document.getElementById('login-success');
 
-        var newUsername = newUsernameInput.value.trim();
-        var newPassword = newPasswordInput.value.trim();
-        var newBalance = parseInt(newBalanceInput.value);
+  var newUsername = newUsernameInput.value.trim();
+  var newPassword = newPasswordInput.value.trim();
+  var newBalance = parseInt(newBalanceInput.value);
 
-        addUserToDB(newUsername, newPassword, newBalance);
+  addUserToDB(newUsername, newPassword, newBalance, function() {
+    console.log('Admin added new user to IndexedDB:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
 
-        console.log('Admin added new user to IndexedDB:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
+    successMessage.textContent = 'User added successfully!';
 
-        successMessage.textContent = 'User added successfully!';
+    newUsernameInput.value = '';
+    newPasswordInput.value = '';
+    newBalanceInput.value = '';
 
-        newUsernameInput.value = '';
-        newPasswordInput.value = '';
-        newBalanceInput.value = '';
+    adminPanel.style.display = 'none';
+  });
+}
 
-        adminPanel.style.display = 'none';
-      }
+function changeBalance() {
+  var changeUsernameInput = document.getElementById('changeUsername');
+  var changeBalanceInput = document.getElementById('changeBalance');
+  var adminPanel = document.getElementById('adminPanel');
+  var successMessage = document.getElementById('login-success');
 
-      function changeBalance() {
-        var changeUsernameInput = document.getElementById('changeUsername');
-        var changeBalanceInput = document.getElementById('changeBalance');
-        var adminPanel = document.getElementById('adminPanel');
-        var successMessage = document.getElementById('login-success');
+  var usernameToChange = changeUsernameInput.value.trim();
+  var newBalanceValue = parseInt(changeBalanceInput.value);
 
-        var usernameToChange = changeUsernameInput.value.trim();
-        var newBalanceValue = parseInt(changeBalanceInput.value);
+  updateUserBalanceInDB(usernameToChange, newBalanceValue, function() {
+    // Display success message
+    successMessage.textContent = 'Balance changed successfully!';
+  });
+}
 
-        updateUserBalanceInDB(usernameToChange, newBalanceValue);
+function addUserToDB(username, password, balance, callback) {
+  var transaction = db.transaction(['users'], 'readwrite');
+  var objectStore = transaction.objectStore('users');
+  var request = objectStore.add({ username: username, password: password, balance: balance });
 
-        // Display success message
-        successMessage.textContent = 'Balance changed successfully!';
-      }
+  request.onsuccess = function(event) {
+    console.log('User added to IndexedDB:', event.target.result);
+    callback();
+  };
+
+  request.onerror = function(event) {
+    console.error('Error adding user to IndexedDB:', event.target.errorCode);
+  };
+}
+
+function updateUserBalanceInDB(username, newBalance, callback) {
+  var transaction = db.transaction(['users'], 'readwrite');
+  var objectStore = transaction.objectStore('users');
+  var request = objectStore.get(username);
+
+  request.onsuccess = function(event) {
+    var user = event.target.result;
+    user.balance = newBalance;
+
+    var updateRequest = objectStore.put(user);
+
+    updateRequest.onsuccess = function(event) {
+      console.log('User balance updated in IndexedDB:', event.target.result);
+      callback();
+    };
+
+    updateRequest.onerror = function(event) {
+      console.error('Error updating user balance in IndexedDB:', event.target.errorCode);
+    };
+  };
+
+  request.onerror = function(event) {
+    console.error('Error getting user for balance update from IndexedDB:', event.target.errorCode);
+  };
+}
+
     </script>
   </div>
 </body>
