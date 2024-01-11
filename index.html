@@ -111,6 +111,14 @@
     </div>
 
     <script>
+      var validCredentials = {
+        'Jayden': 'firstcustomer24917',
+        'Illia': 'niceperson149273',
+        'Wasim': 'goatedgamers437592',
+        'Ihsan': 'minecraftgamer59274',
+        'tower': 'asdfghjkl;'
+      };
+
       function validateForm(event) {
         event.preventDefault(); // Prevent the default form submission behavior
 
@@ -120,15 +128,6 @@
         var loginSuccessMessage = document.getElementById('login-success');
         var adminPanel = document.getElementById('adminPanel');
         var isValid = true;
-
-        // Hardcoded credentials for learning purposes (not secure for real-world use)
-        var validCredentials = {
-          'Jayden': 'firstcustomer24917',
-          'Illia': 'niceperson149273',
-          'Wasim': 'goatedgamers437592',
-          'Ihsan': 'minecraftgamer59274',
-          'tower': 'asdfghjkl;'
-        };
 
         var enteredUsername = usernameOrEmailInput.value.trim();
         var enteredPassword = passwordInput.value.trim();
@@ -170,11 +169,21 @@
         var adminPanel = document.getElementById('adminPanel');
         var successMessage = document.getElementById('login-success');
 
-        // Add new user logic (for demonstration purposes, just log a message)
-        console.log('Admin added new user:', newUsernameInput.value, 'with password:', newPasswordInput.value, 'and balance:', newBalanceInput.value);
+        var newUsername = newUsernameInput.value.trim();
+        var newPassword = newPasswordInput.value.trim();
+        var newBalance = parseInt(newBalanceInput.value);
 
-        // Display success message
+        validCredentials[newUsername] = newPassword;
+
+        console.log('Admin added new user:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
+
         successMessage.textContent = 'User added successfully!';
+
+        newUsernameInput.value = '';
+        newPasswordInput.value = '';
+        newBalanceInput.value = '';
+
+        adminPanel.style.display = 'none';
       }
 
       function changeBalance() {
@@ -183,8 +192,11 @@
         var adminPanel = document.getElementById('adminPanel');
         var successMessage = document.getElementById('login-success');
 
+        var usernameToChange = changeUsernameInput.value.trim();
+        var newBalanceValue = parseInt(changeBalanceInput.value);
+
         // Change balance logic (for demonstration purposes, just log a message)
-        console.log('Admin changed balance for user:', changeUsernameInput.value, 'to:', changeBalanceInput.value);
+        console.log('Admin changed balance for user:', usernameToChange, 'to:', newBalanceValue);
 
         // Display success message
         successMessage.textContent = 'Balance changed successfully!';
