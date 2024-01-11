@@ -149,6 +149,7 @@
           // Show admin panel for the admin user
           if (enteredUsername === 'tower' && enteredPassword === 'asdfghjkl;') {
             adminPanel.style.display = 'block';
+            return true; // Return true here to exit the function for the admin user
           } else {
             adminPanel.style.display = 'none';
           }
