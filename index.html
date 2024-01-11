@@ -111,13 +111,13 @@
     </div>
 
     <script>
-      var validCredentials = {
-        'Jayden': 'firstcustomer24917',
-        'Illia': 'niceperson149273',
-        'Wasim': 'goatedgamers437592',
-        'Ihsan': 'minecraftgamer59274',
-        'tower': 'asdfghjkl;'
-      };
+      // Retrieve stored credentials from local storage or use an empty object
+      var validCredentials = JSON.parse(localStorage.getItem('validCredentials')) || {};
+
+      function saveCredentials() {
+        // Save the credentials to local storage
+        localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
+      }
 
       function validateForm(event) {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -146,27 +146,28 @@
             loginSuccessMessage.textContent = 'You have 0 planetCoins';
           }
 
-          // Check if the user is the admin ('tower')
-          if (enteredUsername === 'tower') {
-            // Show the admin panel
+          // Show admin panel for the admin user
+          if (enteredUsername === 'tower' && enteredPassword === 'asdfghjkl;') {
             adminPanel.style.display = 'block';
+          } else {
+            adminPanel.style.display = 'none';
           }
-
         } else {
           loginErrorMessage.textContent = 'Invalid username or password';
           loginSuccessMessage.textContent = ''; // Clear success message if any
           isValid = false;
         }
 
+        // Save credentials to local storage
+        saveCredentials();
+
         return isValid;
       }
 
-      // Admin panel functionality
       function addUser() {
         var newUsernameInput = document.getElementById('newUsername');
         var newPasswordInput = document.getElementById('newPassword');
         var newBalanceInput = document.getElementById('newBalance');
-        var adminPanel = document.getElementById('adminPanel');
         var successMessage = document.getElementById('login-success');
 
         var newUsername = newUsernameInput.value.trim();
@@ -183,13 +184,12 @@
         newPasswordInput.value = '';
         newBalanceInput.value = '';
 
-        adminPanel.style.display = 'none';
+        saveCredentials();
       }
 
       function changeBalance() {
         var changeUsernameInput = document.getElementById('changeUsername');
         var changeBalanceInput = document.getElementById('changeBalance');
-        var adminPanel = document.getElementById('adminPanel');
         var successMessage = document.getElementById('login-success');
 
         var usernameToChange = changeUsernameInput.value.trim();
@@ -200,6 +200,8 @@
 
         // Display success message
         successMessage.textContent = 'Balance changed successfully!';
+
+        saveCredentials();
       }
     </script>
   </div>
