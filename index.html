@@ -102,6 +102,7 @@
     <div class="admin-panel" id="adminPanel">
       <h3>Admin Panel</h3>
       <input type="text" id="newUsername" placeholder="New User" required>
+      <input type="password" id="newPassword" placeholder="New Password" required>
       <input type="number" id="newBalance" placeholder="New Balance" required>
       <button onclick="addUser()">Add User</button>
       <input type="text" id="changeUsername" placeholder="Username to Change" required>
@@ -164,12 +165,13 @@
       // Admin panel functionality
       function addUser() {
         var newUsernameInput = document.getElementById('newUsername');
+        var newPasswordInput = document.getElementById('newPassword');
         var newBalanceInput = document.getElementById('newBalance');
         var adminPanel = document.getElementById('adminPanel');
         var successMessage = document.getElementById('login-success');
 
         // Add new user logic (for demonstration purposes, just log a message)
-        console.log('Admin added new user:', newUsernameInput.value, 'with balance:', newBalanceInput.value);
+        console.log('Admin added new user:', newUsernameInput.value, 'with password:', newPasswordInput.value, 'and balance:', newBalanceInput.value);
 
         // Display success message
         successMessage.textContent = 'User added successfully!';
