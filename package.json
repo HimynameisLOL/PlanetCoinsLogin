@@ -1,0 +1,17 @@
+{
+  "name": "planetcoins",
+  "version": "1.0.0",
+  "description": "Manage user balances for PlanetCoins",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["planetcoins", "mongodb", "nodejs"],
+  "author": "Tower",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongodb": "^3.6.3"
+    
+  }
+}
