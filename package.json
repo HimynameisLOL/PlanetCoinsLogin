@@ -4,7 +4,7 @@
   "description": "Manage user balances for PlanetCoins",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "keywords": ["planetcoins", "mongodb", "nodejs"],
   "author": "Tower",
