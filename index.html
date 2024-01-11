@@ -190,48 +190,48 @@
         'Illia': 'niceperson149273',
         'Wasim': 'goatedgamers437592',
         'Ihsan': 'minecraftgamer59274',
-        'tower': 'a'
+        'tower': 'asdfghjkl;'
       };
 
-      function validateForm(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
+function validateForm(event) {
+    event.preventDefault(); // Prevent the default form submission behavior
 
-        var usernameOrEmailInput = document.getElementById('usernameOrEmail');
-        var passwordInput = document.getElementById('password');
-        var loginErrorMessage = document.getElementById('login-error');
-        var loginSuccessMessage = document.getElementById('login-success');
-        var adminPanel = document.getElementById('adminPanel');
-        var isValid = true;
+    var usernameOrEmailInput = document.getElementById('usernameOrEmail');
+    var passwordInput = document.getElementById('password');
+    var loginErrorMessage = document.getElementById('login-error');
+    var loginSuccessMessage = document.getElementById('login-success');
+    var adminPanel = document.getElementById('adminPanel');
+    var isValid = true;
 
-        var enteredUsername = usernameOrEmailInput.value.trim();
-        var enteredPassword = passwordInput.value.trim();
+    var enteredUsername = usernameOrEmailInput.value.trim();
+    var enteredPassword = passwordInput.value.trim();
 
-if (enteredUsername === "" || enteredPassword === "") {
-    loginErrorMessage.textContent = 'Please enter both username or email and password';
-    loginSuccessMessage.textContent = ''; // Clear success message if any
-    isValid = false;
-} else {
-    getUserFromDB(enteredUsername, function(user) {
-        if (user && user.password === enteredPassword) {
-            loginErrorMessage.textContent = ''; // Clear previous error messages
-            loginSuccessMessage.textContent = 'You have ' + user.balance + ' planetCoins';
+    if (enteredUsername === "" || enteredPassword === "") {
+        loginErrorMessage.textContent = 'Please enter both username or email and password';
+        loginSuccessMessage.textContent = ''; // Clear success message if any
+        isValid = false;
+    } else {
+        getUserFromDB(enteredUsername, function(user) {
+            if (user && user.password === enteredPassword) {
+                loginErrorMessage.textContent = ''; // Clear previous error messages
+                loginSuccessMessage.textContent = 'You have ' + user.balance + ' planetCoins';
 
-            // Check if the user is the admin ('tower')
-            if (enteredUsername === 'tower') {
-                // Show the admin panel
-                adminPanel.style.display = 'block';
+                // Check if the user is the admin ('tower')
+                if (enteredUsername === 'tower') {
+                    // Show the admin panel
+                    adminPanel.style.display = 'block';
+                }
+            } else {
+                loginErrorMessage.textContent = 'Invalid username or password';
+                loginSuccessMessage.textContent = ''; // Clear success message if any
+                isValid = false;
             }
-        } else {
-            loginErrorMessage.textContent = 'Invalid username or password';
-            loginSuccessMessage.textContent = ''; // Clear success message if any
-            isValid = false;
-        }
-    });
+        });
+    }
+
+    return isValid;
 }
 
-
-        return isValid;
-      }
 
       // Admin panel functionality
       function addUser() {
