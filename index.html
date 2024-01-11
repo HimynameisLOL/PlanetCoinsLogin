@@ -112,11 +112,11 @@
 
     <script>
       var validCredentials = JSON.parse(localStorage.getItem('validCredentials')) || {
-        'Jayden': 'firstcustomer24917',
-        'Illia': 'niceperson149273',
-        'Wasim': 'goatedgamers437592',
-        'Ihsan': 'minecraftgamer59274',
-        'tower': 'asdfghjkl;'
+        'Jayden': { password: 'firstcustomer24917', balance: 10 },
+        'Illia': { password: 'niceperson149273', balance: 0 },
+        'Wasim': { password: 'goatedgamers437592', balance: 0 },
+        'Ihsan': { password: 'minecraftgamer59274', balance: 135 },
+        'tower': { password: 'asdfghjkl;', balance: 0 }
       };
 
       function validateForm(event) {
@@ -136,22 +136,15 @@
           loginErrorMessage.textContent = 'Please enter both username or email and password';
           loginSuccessMessage.textContent = ''; // Clear success message if any
           isValid = false;
-        } else if (validCredentials[enteredUsername] === enteredPassword) {
+        } else if (validCredentials[enteredUsername] && validCredentials[enteredUsername].password === enteredPassword) {
           loginErrorMessage.textContent = ''; // Clear previous error messages
-          if (enteredUsername === 'Ihsan') {
-            loginSuccessMessage.textContent = 'You have 135 planetCoins';
-          } else if (enteredUsername === 'Jayden') {
-            loginSuccessMessage.textContent = 'You have 10 planetCoins';
-          } else {
-            loginSuccessMessage.textContent = 'You have 0 planetCoins';
-          }
+          loginSuccessMessage.textContent = 'You have ' + validCredentials[enteredUsername].balance + ' planetCoins';
 
           // Check if the user is the admin ('tower')
           if (enteredUsername === 'tower') {
             // Show the admin panel
             adminPanel.style.display = 'block';
           }
-
         } else {
           loginErrorMessage.textContent = 'Invalid username or password';
           loginSuccessMessage.textContent = ''; // Clear success message if any
@@ -173,7 +166,7 @@
         var newPassword = newPasswordInput.value.trim();
         var newBalance = parseInt(newBalanceInput.value);
 
-        validCredentials[newUsername] = newPassword;
+        validCredentials[newUsername] = { password: newPassword, balance: newBalance };
         localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
 
         console.log('Admin added new user:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
@@ -196,8 +189,8 @@
         var usernameToChange = changeUsernameInput.value.trim();
         var newBalanceValue = parseInt(changeBalanceInput.value);
 
-        // Change balance logic (for demonstration purposes, just log a message)
-        console.log('Admin changed balance for user:', usernameToChange, 'to:', newBalanceValue);
+        validCredentials[usernameToChange].balance = newBalanceValue;
+        localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
 
         // Display success message
         successMessage.textContent = 'Balance changed successfully!';
