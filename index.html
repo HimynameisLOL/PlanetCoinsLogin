@@ -112,81 +112,7 @@
 
     <script>
       // MongoDB connection string
-      const mongoUri = 'mongodb+srv://admin:pass@cluster0.2fgjzjt.mongodb.net/?retryWrites=true&w=majority';
-
-      // Open or create the IndexedDB database
-      var request = indexedDB.open('UserDatabase', 1);
-      var db;
-
-      request.onupgradeneeded = function (event) {
-        db = event.target.result;
-        // Create an object store with auto-incrementing key
-        var objectStore = db.createObjectStore('users', { keyPath: 'username', autoIncrement: true });
-        // Create an index to allow searching by username
-        objectStore.createIndex('username', 'username', { unique: true });
-      };
-
-      request.onsuccess = function (event) {
-        db = event.target.result;
-      };
-
-      request.onerror = function (event) {
-        console.error('IndexedDB error:', event.target.errorCode);
-      };
-
-      function addUserToDB(username, password, balance) {
-        var transaction = db.transaction(['users'], 'readwrite');
-        var objectStore = transaction.objectStore('users');
-        var request = objectStore.add({ username: username, password: password, balance: balance });
-
-        request.onsuccess = function (event) {
-          console.log('User added to IndexedDB:', event.target.result);
-        };
-
-        request.onerror = function (event) {
-          console.error('Error adding user to IndexedDB:', event.target.errorCode);
-        };
-      }
-
-      function getUserFromDB(username, callback) {
-        var transaction = db.transaction(['users'], 'readonly');
-        var objectStore = transaction.objectStore('users');
-        var request = objectStore.get(username);
-
-        request.onsuccess = function (event) {
-          callback(event.target.result);
-        };
-
-        request.onerror = function (event) {
-          console.error('Error getting user from IndexedDB:', event.target.errorCode);
-          callback(null);
-        };
-      }
-
-      function updateUserBalanceInDB(username, newBalance) {
-        var transaction = db.transaction(['users'], 'readwrite');
-        var objectStore = transaction.objectStore('users');
-        var request = objectStore.get(username);
-
-        request.onsuccess = function (event) {
-          var user = event.target.result;
-          user.balance = newBalance;
-
-          var updateRequest = objectStore.put(user);
-
-          updateRequest.onsuccess = function (event) {
-            console.log('User balance updated in IndexedDB:', event.target.result);
-          };
-
-          updateRequest.onerror = function (event) {
-            console.error('Error updating user balance in IndexedDB:', event.target.errorCode);
-          };
-        };
-
-        request.onerror = function (event) {
-          console.error('Error getting user for balance update from IndexedDB:', event.target.errorCode);
-        };
-      }
+      const mongoUri = 'mongodb+srv://admin:pass@cluster0.2fgjzjt.mongodb.net/planetcoins?retryWrites=true&w=majority';
 
       function validateForm(event) {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -270,10 +196,7 @@
         // Add user to MongoDB
         addUserToMongoDB(newUsername, newPassword, newBalance);
 
-        // Add user to IndexedDB
-        addUserToDB(newUsername, newPassword, newBalance);
-
-        console.log('Admin added new user to MongoDB and IndexedDB:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
+        console.log('Admin added new user to MongoDB:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
 
         successMessage.textContent = 'User added successfully!';
 
@@ -310,32 +233,6 @@
         };
       }
 
-      // Function to change user balance in MongoDB
-      function changeUserBalanceInMongoDB(username, newBalance) {
-        // Create a new XMLHttpRequest object
-        var xhr = new XMLHttpRequest();
-
-        // Configure it: POST-method, URL, async (true)
-        xhr.open("POST", `${mongoUri}/changeBalance`, true);
-
-        // Set the request header to send JSON data
-        xhr.setRequestHeader("Content-Type", "application/json");
-
-        // Convert balance change data to JSON format
-        var balanceChangeData = JSON.stringify({ username: username, newBalance: newBalance });
-
-        // Send the request with balance change data
-        xhr.send(balanceChangeData);
-
-        // This will be called after the response is received
-        xhr.onload = function () {
-          // Check if the request was successful
-          if (xhr.status !== 200) {
-            console.error('Failed to change user balance in MongoDB');
-          }
-        };
-      }
-
       // Admin panel functionality to change user balance
       function changeBalance() {
         var changeUsernameInput = document.getElementById('changeUsername');
@@ -348,9 +245,6 @@
 
         // Change user balance in MongoDB
         changeUserBalanceInMongoDB(usernameToChange, newBalanceValue);
-
-        // Change user balance in IndexedDB
-        updateUserBalanceInDB(usernameToChange, newBalanceValue);
 
         // Display success message
         successMessage.textContent = 'Balance changed successfully!';
