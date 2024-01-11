@@ -111,7 +111,8 @@
     </div>
 
     <script>
-      var validCredentials = {
+      // Retrieve credentials and balances from local storage
+      var validCredentials = JSON.parse(localStorage.getItem('validCredentials')) || {
         'Jayden': 'firstcustomer24917',
         'Illia': 'niceperson149273',
         'Wasim': 'goatedgamers437592',
@@ -143,7 +144,7 @@
           } else if (enteredUsername === 'Jayden') {
             loginSuccessMessage.textContent = 'You have 10 planetCoins';
           } else {
-            loginSuccessMessage.textContent = 'You have 0 planetCoins';
+            loginSuccessMessage.textContent = ''; // Hide balance for other users
           }
 
           // Check if the user is the admin ('tower')
@@ -174,6 +175,9 @@
         var newBalance = parseInt(newBalanceInput.value);
 
         validCredentials[newUsername] = newPassword;
+
+        // Save updated credentials to local storage
+        localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
 
         console.log('Admin added new user:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
 
