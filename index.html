@@ -111,13 +111,82 @@
     </div>
 
     <script>
-      var validCredentials = JSON.parse(localStorage.getItem('validCredentials')) || {
-        'Jayden': { password: 'firstcustomer24917', balance: 10 },
-        'Illia': { password: 'niceperson149273', balance: 0 },
-        'Wasim': { password: 'goatedgamers437592', balance: 0 },
-        'Ihsan': { password: 'minecraftgamer59274', balance: 135 },
-        'tower': { password: 'asdfghjkl;', balance: 0 }
+      // MongoDB connection string
+      const mongoUri = 'mongodb+srv://admin:pass@cluster0.2fgjzjt.mongodb.net/?retryWrites=true&w=majority';
+
+      // Open or create the IndexedDB database
+      var request = indexedDB.open('UserDatabase', 1);
+      var db;
+
+      request.onupgradeneeded = function (event) {
+        db = event.target.result;
+        // Create an object store with auto-incrementing key
+        var objectStore = db.createObjectStore('users', { keyPath: 'username', autoIncrement: true });
+        // Create an index to allow searching by username
+        objectStore.createIndex('username', 'username', { unique: true });
       };
+
+      request.onsuccess = function (event) {
+        db = event.target.result;
+      };
+
+      request.onerror = function (event) {
+        console.error('IndexedDB error:', event.target.errorCode);
+      };
+
+      function addUserToDB(username, password, balance) {
+        var transaction = db.transaction(['users'], 'readwrite');
+        var objectStore = transaction.objectStore('users');
+        var request = objectStore.add({ username: username, password: password, balance: balance });
+
+        request.onsuccess = function (event) {
+          console.log('User added to IndexedDB:', event.target.result);
+        };
+
+        request.onerror = function (event) {
+          console.error('Error adding user to IndexedDB:', event.target.errorCode);
+        };
+      }
+
+      function getUserFromDB(username, callback) {
+        var transaction = db.transaction(['users'], 'readonly');
+        var objectStore = transaction.objectStore('users');
+        var request = objectStore.get(username);
+
+        request.onsuccess = function (event) {
+          callback(event.target.result);
+        };
+
+        request.onerror = function (event) {
+          console.error('Error getting user from IndexedDB:', event.target.errorCode);
+          callback(null);
+        };
+      }
+
+      function updateUserBalanceInDB(username, newBalance) {
+        var transaction = db.transaction(['users'], 'readwrite');
+        var objectStore = transaction.objectStore('users');
+        var request = objectStore.get(username);
+
+        request.onsuccess = function (event) {
+          var user = event.target.result;
+          user.balance = newBalance;
+
+          var updateRequest = objectStore.put(user);
+
+          updateRequest.onsuccess = function (event) {
+            console.log('User balance updated in IndexedDB:', event.target.result);
+          };
+
+          updateRequest.onerror = function (event) {
+            console.error('Error updating user balance in IndexedDB:', event.target.errorCode);
+          };
+        };
+
+        request.onerror = function (event) {
+          console.error('Error getting user for balance update from IndexedDB:', event.target.errorCode);
+        };
+      }
 
       function validateForm(event) {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -136,22 +205,54 @@
           loginErrorMessage.textContent = 'Please enter both username or email and password';
           loginSuccessMessage.textContent = ''; // Clear success message if any
           isValid = false;
-        } else if (validCredentials[enteredUsername] && validCredentials[enteredUsername].password === enteredPassword) {
-          loginErrorMessage.textContent = ''; // Clear previous error messages
-          loginSuccessMessage.textContent = 'You have ' + validCredentials[enteredUsername].balance + ' planetCoins';
-
-          // Check if the user is the admin ('tower')
-          if (enteredUsername === 'tower') {
-            // Show the admin panel
-            adminPanel.style.display = 'block';
-          }
         } else {
-          loginErrorMessage.textContent = 'Invalid username or password';
-          loginSuccessMessage.textContent = ''; // Clear success message if any
-          isValid = false;
+          // Validate user against MongoDB
+          validateUserAgainstMongoDB(enteredUsername, enteredPassword, function (user) {
+            if (user) {
+              loginErrorMessage.textContent = ''; // Clear previous error messages
+              loginSuccessMessage.textContent = 'You have ' + user.balance + ' planetCoins';
+
+              // Check if the user is the admin ('admin')
+              if (enteredUsername === 'admin') {
+                // Show the admin panel
+                adminPanel.style.display = 'block';
+              }
+            } else {
+              loginErrorMessage.textContent = 'Invalid username or password';
+              loginSuccessMessage.textContent = ''; // Clear success message if any
+              isValid = false;
+            }
+          });
         }
 
         return isValid;
+      }
+
+      // Function to validate user credentials against MongoDB
+      function validateUserAgainstMongoDB(username, password, callback) {
+        // Create a new XMLHttpRequest object
+        var xhr = new XMLHttpRequest();
+
+        // Configure it: GET-method, URL, async (true)
+        xhr.open("GET", `${mongoUri}/validate?username=${username}&password=${password}`, true);
+
+        // Send the request
+        xhr.send();
+
+        // This will be called after the response is received
+        xhr.onload = function () {
+          // Check if the request was successful
+          if (xhr.status === 200) {
+            // Parse the JSON response
+            var user = JSON.parse(xhr.responseText);
+
+            // Call the callback function with the user object
+            callback(user);
+          } else {
+            console.error('Failed to validate user against MongoDB');
+            callback(null);
+          }
+        };
       }
 
       // Admin panel functionality
@@ -166,10 +267,13 @@
         var newPassword = newPasswordInput.value.trim();
         var newBalance = parseInt(newBalanceInput.value);
 
-        validCredentials[newUsername] = { password: newPassword, balance: newBalance };
-        localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
+        // Add user to MongoDB
+        addUserToMongoDB(newUsername, newPassword, newBalance);
 
-        console.log('Admin added new user:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
+        // Add user to IndexedDB
+        addUserToDB(newUsername, newPassword, newBalance);
+
+        console.log('Admin added new user to MongoDB and IndexedDB:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
 
         successMessage.textContent = 'User added successfully!';
 
@@ -180,6 +284,59 @@
         adminPanel.style.display = 'none';
       }
 
+      // Function to add user to MongoDB
+      function addUserToMongoDB(username, password, balance) {
+        // Create a new XMLHttpRequest object
+        var xhr = new XMLHttpRequest();
+
+        // Configure it: POST-method, URL, async (true)
+        xhr.open("POST", `${mongoUri}/addUser`, true);
+
+        // Set the request header to send JSON data
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // Convert user data to JSON format
+        var userData = JSON.stringify({ username: username, password: password, balance: balance });
+
+        // Send the request with user data
+        xhr.send(userData);
+
+        // This will be called after the response is received
+        xhr.onload = function () {
+          // Check if the request was successful
+          if (xhr.status !== 200) {
+            console.error('Failed to add user to MongoDB');
+          }
+        };
+      }
+
+      // Function to change user balance in MongoDB
+      function changeUserBalanceInMongoDB(username, newBalance) {
+        // Create a new XMLHttpRequest object
+        var xhr = new XMLHttpRequest();
+
+        // Configure it: POST-method, URL, async (true)
+        xhr.open("POST", `${mongoUri}/changeBalance`, true);
+
+        // Set the request header to send JSON data
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        // Convert balance change data to JSON format
+        var balanceChangeData = JSON.stringify({ username: username, newBalance: newBalance });
+
+        // Send the request with balance change data
+        xhr.send(balanceChangeData);
+
+        // This will be called after the response is received
+        xhr.onload = function () {
+          // Check if the request was successful
+          if (xhr.status !== 200) {
+            console.error('Failed to change user balance in MongoDB');
+          }
+        };
+      }
+
+      // Admin panel functionality to change user balance
       function changeBalance() {
         var changeUsernameInput = document.getElementById('changeUsername');
         var changeBalanceInput = document.getElementById('changeBalance');
@@ -189,8 +346,11 @@
         var usernameToChange = changeUsernameInput.value.trim();
         var newBalanceValue = parseInt(changeBalanceInput.value);
 
-        validCredentials[usernameToChange].balance = newBalanceValue;
-        localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
+        // Change user balance in MongoDB
+        changeUserBalanceInMongoDB(usernameToChange, newBalanceValue);
+
+        // Change user balance in IndexedDB
+        updateUserBalanceInDB(usernameToChange, newBalanceValue);
 
         // Display success message
         successMessage.textContent = 'Balance changed successfully!';
