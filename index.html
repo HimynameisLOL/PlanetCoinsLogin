@@ -111,8 +111,81 @@
     </div>
 
     <script>
-      // Retrieve credentials and balances from local storage
-      var validCredentials = JSON.parse(localStorage.getItem('validCredentials')) || {
+      // Open or create the IndexedDB database
+      var request = indexedDB.open('UserDatabase', 1);
+      var db;
+
+      request.onupgradeneeded = function(event) {
+        db = event.target.result;
+        // Create an object store with auto-incrementing key
+        var objectStore = db.createObjectStore('users', { keyPath: 'username', autoIncrement: true });
+        // Create an index to allow searching by username
+        objectStore.createIndex('username', 'username', { unique: true });
+      };
+
+      request.onsuccess = function(event) {
+        db = event.target.result;
+      };
+
+      request.onerror = function(event) {
+        console.error('IndexedDB error:', event.target.errorCode);
+      };
+
+      function addUserToDB(username, password, balance) {
+        var transaction = db.transaction(['users'], 'readwrite');
+        var objectStore = transaction.objectStore('users');
+        var request = objectStore.add({ username: username, password: password, balance: balance });
+
+        request.onsuccess = function(event) {
+          console.log('User added to IndexedDB:', event.target.result);
+        };
+
+        request.onerror = function(event) {
+          console.error('Error adding user to IndexedDB:', event.target.errorCode);
+        };
+      }
+
+      function getUserFromDB(username, callback) {
+        var transaction = db.transaction(['users'], 'readonly');
+        var objectStore = transaction.objectStore('users');
+        var request = objectStore.get(username);
+
+        request.onsuccess = function(event) {
+          callback(event.target.result);
+        };
+
+        request.onerror = function(event) {
+          console.error('Error getting user from IndexedDB:', event.target.errorCode);
+          callback(null);
+        };
+      }
+
+      function updateUserBalanceInDB(username, newBalance) {
+        var transaction = db.transaction(['users'], 'readwrite');
+        var objectStore = transaction.objectStore('users');
+        var request = objectStore.get(username);
+
+        request.onsuccess = function(event) {
+          var user = event.target.result;
+          user.balance = newBalance;
+
+          var updateRequest = objectStore.put(user);
+
+          updateRequest.onsuccess = function(event) {
+            console.log('User balance updated in IndexedDB:', event.target.result);
+          };
+
+          updateRequest.onerror = function(event) {
+            console.error('Error updating user balance in IndexedDB:', event.target.errorCode);
+          };
+        };
+
+        request.onerror = function(event) {
+          console.error('Error getting user for balance update from IndexedDB:', event.target.errorCode);
+        };
+      }
+
+      var validCredentials = {
         'Jayden': 'firstcustomer24917',
         'Illia': 'niceperson149273',
         'Wasim': 'goatedgamers437592',
@@ -137,26 +210,23 @@
           loginErrorMessage.textContent = 'Please enter both username or email and password';
           loginSuccessMessage.textContent = ''; // Clear success message if any
           isValid = false;
-        } else if (validCredentials[enteredUsername] === enteredPassword) {
-          loginErrorMessage.textContent = ''; // Clear previous error messages
-          if (enteredUsername === 'Ihsan') {
-            loginSuccessMessage.textContent = 'You have 135 planetCoins';
-          } else if (enteredUsername === 'Jayden') {
-            loginSuccessMessage.textContent = 'You have 10 planetCoins';
-          } else {
-            loginSuccessMessage.textContent = ''; // Hide balance for other users
-          }
-
-          // Check if the user is the admin ('tower')
-          if (enteredUsername === 'tower') {
-            // Show the admin panel
-            adminPanel.style.display = 'block';
-          }
-
         } else {
-          loginErrorMessage.textContent = 'Invalid username or password';
-          loginSuccessMessage.textContent = ''; // Clear success message if any
-          isValid = false;
+          getUserFromDB(enteredUsername, function(user) {
+            if (user && user.password === enteredPassword) {
+              loginErrorMessage.textContent = ''; // Clear previous error messages
+              loginSuccessMessage.textContent = 'You have ' + user.balance + ' planetCoins';
+
+              // Check if the user is the admin ('tower')
+              if (enteredUsername === 'tower') {
+                // Show the admin panel
+                adminPanel.style.display = 'block';
+              }
+            } else {
+              loginErrorMessage.textContent = 'Invalid username or password';
+              loginSuccessMessage.textContent = ''; // Clear success message if any
+              isValid = false;
+            }
+          });
         }
 
         return isValid;
@@ -174,12 +244,9 @@
         var newPassword = newPasswordInput.value.trim();
         var newBalance = parseInt(newBalanceInput.value);
 
-        validCredentials[newUsername] = newPassword;
+        addUserToDB(newUsername, newPassword, newBalance);
 
-        // Save updated credentials to local storage
-        localStorage.setItem('validCredentials', JSON.stringify(validCredentials));
-
-        console.log('Admin added new user:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
+        console.log('Admin added new user to IndexedDB:', newUsername, 'with password:', newPassword, 'and balance:', newBalance);
 
         successMessage.textContent = 'User added successfully!';
 
@@ -199,8 +266,7 @@
         var usernameToChange = changeUsernameInput.value.trim();
         var newBalanceValue = parseInt(changeBalanceInput.value);
 
-        // Change balance logic (for demonstration purposes, just log a message)
-        console.log('Admin changed balance for user:', usernameToChange, 'to:', newBalanceValue);
+        updateUserBalanceInDB(usernameToChange, newBalanceValue);
 
         // Display success message
         successMessage.textContent = 'Balance changed successfully!';
