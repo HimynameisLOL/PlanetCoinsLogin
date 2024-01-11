@@ -102,7 +102,7 @@
         var validCredentials = {
           'Jayden': 'firstcustomer24917',
           'Illia': 'niceperson149273',
-          'Wasim': 'goatedgamers437592'
+          'Wasim': 'goatedgamers437592',
           'Ihsan': 'minecraftgamer59274'
         };
 
@@ -117,7 +117,7 @@
           loginErrorMessage.textContent = ''; // Clear previous error messages
           if (enteredUsername === 'Ihsan') {
             loginSuccessMessage.textContent = 'You have 135 planetCoins';
-          if (enteredUsername === 'Jayden') {
+          } else if (enteredUsername === 'Jayden') {
             loginSuccessMessage.textContent = 'You have 10 planetCoins';
           } else {
             loginSuccessMessage.textContent = 'You have 0 planetCoins';
