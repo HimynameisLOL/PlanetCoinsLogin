@@ -103,6 +103,7 @@
           'Jayden': 'firstcustomer24917',
           'Illia': 'niceperson149273',
           'Wasim': 'goatedgamers437592'
+          'Ihsan': 'minecraftgamer59274'
         };
 
         var enteredUsername = usernameOrEmailInput.value.trim();
@@ -114,6 +115,8 @@
           isValid = false;
         } else if (validCredentials[enteredUsername] === enteredPassword) {
           loginErrorMessage.textContent = ''; // Clear previous error messages
+          if (enteredUsername === 'Ihsan') {
+            loginSuccessMessage.textContent = 'You have 135 planetCoins';
           if (enteredUsername === 'Jayden') {
             loginSuccessMessage.textContent = 'You have 10 planetCoins';
           } else {
