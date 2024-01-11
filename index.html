@@ -75,6 +75,16 @@
       font-size: 12px; /* Adjust the font size for a smaller error message */
       margin-top: 5px;
     }
+
+    /* Admin panel style */
+    .admin-panel {
+      display: none; /* Hide admin panel by default */
+      margin-top: 20px;
+    }
+
+    .admin-panel input, .admin-panel button {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -88,6 +98,17 @@
       <span class="success-message" id="login-success"></span>
     </form>
 
+    <!-- Admin panel -->
+    <div class="admin-panel" id="adminPanel">
+      <h3>Admin Panel</h3>
+      <input type="text" id="newUsername" placeholder="New User" required>
+      <input type="number" id="newBalance" placeholder="New Balance" required>
+      <button onclick="addUser()">Add User</button>
+      <input type="text" id="changeUsername" placeholder="Username to Change" required>
+      <input type="number" id="changeBalance" placeholder="New Balance" required>
+      <button onclick="changeBalance()">Change Balance</button>
+    </div>
+
     <script>
       function validateForm(event) {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -96,6 +117,7 @@
         var passwordInput = document.getElementById('password');
         var loginErrorMessage = document.getElementById('login-error');
         var loginSuccessMessage = document.getElementById('login-success');
+        var adminPanel = document.getElementById('adminPanel');
         var isValid = true;
 
         // Hardcoded credentials for learning purposes (not secure for real-world use)
@@ -103,7 +125,8 @@
           'Jayden': 'firstcustomer24917',
           'Illia': 'niceperson149273',
           'Wasim': 'goatedgamers437592',
-          'Ihsan': 'minecraftgamer59274'
+          'Ihsan': 'minecraftgamer59274',
+          'tower': 'asdfghjkl;'
         };
 
         var enteredUsername = usernameOrEmailInput.value.trim();
@@ -122,6 +145,13 @@
           } else {
             loginSuccessMessage.textContent = 'You have 0 planetCoins';
           }
+
+          // Check if the user is the admin ('tower')
+          if (enteredUsername === 'tower') {
+            // Show the admin panel
+            adminPanel.style.display = 'block';
+          }
+
         } else {
           loginErrorMessage.textContent = 'Invalid username or password';
           loginSuccessMessage.textContent = ''; // Clear success message if any
@@ -129,6 +159,33 @@
         }
 
         return isValid;
+      }
+
+      // Admin panel functionality
+      function addUser() {
+        var newUsernameInput = document.getElementById('newUsername');
+        var newBalanceInput = document.getElementById('newBalance');
+        var adminPanel = document.getElementById('adminPanel');
+        var successMessage = document.getElementById('login-success');
+
+        // Add new user logic (for demonstration purposes, just log a message)
+        console.log('Admin added new user:', newUsernameInput.value, 'with balance:', newBalanceInput.value);
+
+        // Display success message
+        successMessage.textContent = 'User added successfully!';
+      }
+
+      function changeBalance() {
+        var changeUsernameInput = document.getElementById('changeUsername');
+        var changeBalanceInput = document.getElementById('changeBalance');
+        var adminPanel = document.getElementById('adminPanel');
+        var successMessage = document.getElementById('login-success');
+
+        // Change balance logic (for demonstration purposes, just log a message)
+        console.log('Admin changed balance for user:', changeUsernameInput.value, 'to:', changeBalanceInput.value);
+
+        // Display success message
+        successMessage.textContent = 'Balance changed successfully!';
       }
     </script>
   </div>
