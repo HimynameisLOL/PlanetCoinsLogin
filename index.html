@@ -206,28 +206,29 @@
         var enteredUsername = usernameOrEmailInput.value.trim();
         var enteredPassword = passwordInput.value.trim();
 
-        if (enteredUsername === "" || enteredPassword === "") {
-          loginErrorMessage.textContent = 'Please enter both username or email and password';
-          loginSuccessMessage.textContent = ''; // Clear success message if any
-          isValid = false;
-        } else {
-          getUserFromDB(enteredUsername, function(user) {
-            if (user && user.password === enteredPassword) {
-              loginErrorMessage.textContent = ''; // Clear previous error messages
-              loginSuccessMessage.textContent = 'You have ' + user.balance + ' planetCoins';
+if (enteredUsername === "" || enteredPassword === "") {
+    loginErrorMessage.textContent = 'Please enter both username or email and password';
+    loginSuccessMessage.textContent = ''; // Clear success message if any
+    isValid = false;
+} else {
+    getUserFromDB(enteredUsername, function(user) {
+        if (user && user.password === enteredPassword) {
+            loginErrorMessage.textContent = ''; // Clear previous error messages
+            loginSuccessMessage.textContent = 'You have ' + user.balance + ' planetCoins';
 
-              // Check if the user is the admin ('tower')
-              if (enteredUsername === 'tower') {
+            // Check if the user is the admin ('tower')
+            if (enteredUsername === 'tower') {
                 // Show the admin panel
                 adminPanel.style.display = 'block';
-              }
-            } else {
-              loginErrorMessage.textContent = 'Invalid username or password';
-              loginSuccessMessage.textContent = ''; // Clear success message if any
-              isValid = false;
             }
-          });
+        } else {
+            loginErrorMessage.textContent = 'Invalid username or password';
+            loginSuccessMessage.textContent = ''; // Clear success message if any
+            isValid = false;
         }
+    });
+}
+
 
         return isValid;
       }
